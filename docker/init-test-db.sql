@@ -1,0 +1,2 @@
+CREATE DATABASE survey_test;
+GRANT ALL PRIVILEGES ON DATABASE survey_test TO survey;
