@@ -2,7 +2,6 @@
 
 use App\Ai\Agents\RegistrationAssistantAgent;
 use App\Models\Event;
-use App\Models\Registration;
 
 test('registration chat can be started', function () {
     $event = Event::factory()->create([

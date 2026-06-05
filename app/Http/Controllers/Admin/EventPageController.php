@@ -24,11 +24,14 @@ class EventPageController extends Controller
     public function show(Event $event)
     {
         // TODO: Implement Blade view for admin event show
+        $event->load([
+            'booths' => fn ($q) => $q->withCount('knowledgeChunks'),
+            'sessions' => fn ($q) => $q->with(['visitor'])->withCount('questions')->latest(),
+        ]);
+        $event->loadCount('knowledgeChunks');
+
         return view('admin.events.show', [
-            'event' => $event->load([
-                'booths',
-                'sessions' => fn ($q) => $q->with(['visitor'])->withCount('questions')->latest(),
-            ]),
+            'event' => $event,
         ]);
     }
 

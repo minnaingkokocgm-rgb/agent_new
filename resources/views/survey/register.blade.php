@@ -323,11 +323,11 @@ $(function() {
             }),
             success: function(res) {
                 $formAlert.removeClass('d-none alert-danger').addClass('alert-success')
-                    .html('<i class="bi bi-check-circle"></i> ' + res.message + ' Redirecting...');
-                // Redirect to complete page
+                    .html('<i class="bi bi-check-circle"></i> ' + res.message + ' Redirecting to survey...');
+                // Redirect to survey page with visitor_id
                 setTimeout(function() {
-                    window.location.href = '/s/' + eventId + '/register/complete';
-                }, 1000);
+                    window.location.href = '/s/' + eventId + '?visitor_id=' + res.visitor_id;
+                }, 800);
             },
             error: function(xhr) {
                 const errors = xhr.responseJSON?.errors;

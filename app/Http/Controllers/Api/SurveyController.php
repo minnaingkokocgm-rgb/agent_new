@@ -24,7 +24,7 @@ class SurveyController extends Controller
         }
 
         return response()->json(
-            $starter->handle($event, $booth)
+            $starter->handle($event, $booth, $request->integer('visitor_id') ?: null)
         );
     }
 

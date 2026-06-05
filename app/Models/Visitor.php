@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['session_token', 'name', 'email', 'phone', 'metadata'])]
+#[Fillable(['session_token', 'name', 'email', 'phone', 'company', 'job_title', 'country', 'metadata'])]
 class Visitor extends Model
 {
     /** @use HasFactory<VisitorFactory> */
@@ -31,6 +31,12 @@ class Visitor extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(SessionAnswer::class);
+    }
+
+    /** @return HasMany<Registration, $this> */
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
     }
 
     /** @return HasMany<Summary, $this> */

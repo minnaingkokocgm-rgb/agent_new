@@ -6,6 +6,7 @@ use App\Ai\Agents\RegistrationAssistantAgent;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Registration;
+use App\Models\Visitor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -99,14 +100,27 @@ class RegistrationController extends Controller
 
         $registration = Registration::where('session_token', $request->input('session_token'))->firstOrFail();
 
+        // Create a Visitor record from registration data for survey flow
+        $visitor = Visitor::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'company' => $validated['company'] ?? null,
+            'job_title' => $validated['job_title'] ?? null,
+            'country' => $validated['country'] ?? null,
+            'session_token' => $registration->session_token,
+        ]);
+
         $registration->update([
             ...$validated,
+            'visitor_id' => $visitor->id,
             'status' => 'submitted',
         ]);
 
         return response()->json([
             'message' => 'Registration submitted successfully!',
             'registration_id' => $registration->id,
+            'visitor_id' => $visitor->id,
             'status' => 'submitted',
         ]);
     }

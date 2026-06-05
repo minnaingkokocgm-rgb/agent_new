@@ -29,7 +29,7 @@
                 <i class="bi bi-send"></i>
             </button>
         </form>
-        <div class="text-center text-muted small mt-1" id="questionCounter">Question 1 of 5</div>
+        <div class="text-center text-muted small mt-1" id="questionCounter">Question 1 of 4</div>
     </div>
 
     <!-- Completed State -->
@@ -47,6 +47,7 @@
 $(function() {
     const eventId = {{ $event['id'] }};
     const boothId = {{ isset($booth) ? $booth['id'] : 'null' }};
+    const visitorId = {{ $visitorId ?? 'null' }};
     let sessionId = null;
     let questionCount = 0;
     let isCompleted = false;
@@ -115,14 +116,15 @@ $(function() {
             contentType: 'application/json',
             data: JSON.stringify({
                 event_id: eventId,
-                booth_id: boothId
+                booth_id: boothId,
+                visitor_id: visitorId
             }),
             success: function(res) {
                 sessionId = res.session_id;
                 questionCount = 1;
                 hideTyping();
                 addMessage(res.message, 'ai');
-                $questionCounter.text('Question ' + questionCount + ' of 5');
+                $questionCounter.text('Question ' + questionCount + ' of 4');
                 enableInput();
             },
             error: function() {
@@ -153,7 +155,7 @@ $(function() {
                     completeSurvey();
                 } else {
                     questionCount++;
-                    $questionCounter.text('Question ' + questionCount + ' of 5');
+                    $questionCounter.text('Question ' + questionCount + ' of 4');
                     enableInput();
                 }
             },

@@ -51,13 +51,29 @@
                 <div class="card-body">
                     @forelse($event->booths as $booth)
                         <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
-                            <div>
-                                <h6 class="mb-1">{{ $booth->name }}</h6>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-1">{{ $booth->name }}</h6>
+                                    <div class="d-flex gap-1 align-items-center">
+                                        @if($booth->knowledge_chunks_count > 0)
+                                            <span class="badge bg-success" title="{{ $booth->knowledge_chunks_count }} knowledge chunks indexed">
+                                                <i class="bi bi-database-check"></i> {{ $booth->knowledge_chunks_count }} chunks
+                                            </span>
+                                        @else
+                                            <span class="badge bg-warning text-dark" title="No knowledge uploaded yet">
+                                                <i class="bi bi-exclamation-triangle"></i> No knowledge
+                                            </span>
+                                        @endif
+                                        <a href="#knowledge-form" class="btn btn-outline-primary btn-sm" onclick="selectBoothForUpload({{ $booth->id }})" title="Upload knowledge for this booth">
+                                            <i class="bi bi-upload"></i>
+                                        </a>
+                                        <button class="btn btn-outline-danger btn-sm delete-booth-btn" data-id="{{ $booth->id }}" title="Delete booth">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
                                 <p class="text-muted small mb-0">{{ Str::limit($booth->description, 100) }}</p>
                             </div>
-                            <button class="btn btn-outline-danger btn-sm delete-booth-btn" data-id="{{ $booth->id }}" title="Delete booth">
-                                <i class="bi bi-trash"></i>
-                            </button>
                         </div>
                     @empty
                         <p class="text-muted text-center mb-0">No booths yet. Add one to scope survey questions to a specific booth.</p>
@@ -66,23 +82,34 @@
             </div>
 
             <!-- Knowledge Base -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
+            <div class="card shadow-sm" id="knowledge-form">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Knowledge Base</h5>
+                    @if($event->knowledge_chunks_count > 0)
+                        <span class="badge bg-success">
+                            <i class="bi bi-database-check"></i> {{ $event->knowledge_chunks_count }} total chunks
+                        </span>
+                    @else
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-exclamation-triangle"></i> No knowledge uploaded
+                        </span>
+                    @endif
                 </div>
                 <div class="card-body">
                     <p class="text-muted small">Upload documents to help the AI agent answer visitor questions about your event.</p>
-                    <form id="knowledge-form">
+                    <form id="knowledge-upload-form">
                         <div class="mb-3">
                             <label for="source_name" class="form-label">Source Name</label>
                             <input type="text" id="source_name" class="form-control" placeholder="e.g. product-info.txt" required>
                         </div>
                         <div class="mb-3">
-                            <label for="booth_select" class="form-label">Scope to Booth (optional)</label>
+                            <label for="booth_select" class="form-label">Scope to Booth <small class="text-muted">— scoped chunks power booth-specific surveys</small></label>
                             <select id="booth_select" class="form-select">
-                                <option value="">Event-wide knowledge</option>
+                                <option value="">Event-wide (applies to all booths)</option>
                                 @foreach($event->booths as $booth)
-                                    <option value="{{ $booth->id }}">{{ $booth->name }}</option>
+                                    <option value="{{ $booth->id }}">
+                                        {{ $booth->name }} ({{ $booth->knowledge_chunks_count }} chunks)
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -198,6 +225,12 @@ function copySurveyUrl() {
     alert('Survey URL copied!');
 }
 
+// Scroll to knowledge form and pre-select a booth
+function selectBoothForUpload(boothId) {
+    $('#booth_select').val(boothId);
+    $('#knowledge_content').focus();
+}
+
 $(function() {
     // Create Booth
     $('#create-booth-form').on('submit', function(e) {
@@ -237,7 +270,7 @@ $(function() {
     });
 
     // Upload Knowledge
-    $('#knowledge-form').on('submit', function(e) {
+    $('#knowledge-upload-form').on('submit', function(e) {
         e.preventDefault();
         const $btn = $('#knowledge-btn');
         const $alert = $('#knowledge-alert');
@@ -255,8 +288,9 @@ $(function() {
             }),
             success: function(res) {
                 $alert.removeClass('d-none alert-danger').addClass('alert-success')
-                    .text('Indexed ' + res.chunks_created + ' chunks successfully!');
+                    .html('Indexed <strong>' + res.chunks_created + '</strong> chunks successfully! Reloading...');
                 $('#knowledge_content').val('');
+                setTimeout(function() { location.reload(); }, 800);
             },
             error: function(xhr) {
                 $alert.removeClass('d-none alert-success').addClass('alert-danger')

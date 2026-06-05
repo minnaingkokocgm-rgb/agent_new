@@ -13,6 +13,8 @@ use Stringable;
 
 class EventKnowledgeSearch implements Tool
 {
+    private const MinimumSimilarity = 0.1;
+
     protected string $description = 'Search event and booth knowledge base for relevant information. Use this when you need to reference specific event details, booth products, or answer visitor questions about the event.';
 
     public function __construct(
@@ -36,11 +38,15 @@ class EventKnowledgeSearch implements Tool
 
         $queryEmbedding = $embeddingResponse->embeddings[0];
 
-        // Search knowledge_chunks scoped to this event (and booth if applicable)
+        // Search knowledge_chunks scoped to this event.
+        // When booth is set: include both booth-specific AND event-wide chunks.
         $results = KnowledgeChunk::query()
             ->where('event_id', $this->event->id)
-            ->when($this->booth, fn ($q) => $q->where('booth_id', $this->booth->id))
-            ->whereVectorSimilarTo('embedding', $queryEmbedding, 0.6)
+            ->when($this->booth, fn ($q) => $q->where(function ($q) {
+                $q->where('booth_id', $this->booth->id)
+                    ->orWhereNull('booth_id');
+            }))
+            ->whereVectorSimilarTo('embedding', $queryEmbedding, self::MinimumSimilarity)
             ->limit(5)
             ->get();
 

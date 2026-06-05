@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'event_id', 'name', 'email', 'phone', 'company',
+    'event_id', 'visitor_id', 'name', 'email', 'phone', 'company',
     'job_title', 'country', 'source', 'notes',
     'document_path', 'session_token', 'status', 'metadata',
 ])]
@@ -29,5 +29,11 @@ class Registration extends Model
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    /** @return BelongsTo<Visitor, $this> */
+    public function visitor(): BelongsTo
+    {
+        return $this->belongsTo(Visitor::class);
     }
 }

@@ -4,19 +4,18 @@ use App\Ai\Agents\SurveyAgent;
 use App\Models\Event;
 use App\Models\VisitorSession;
 
-test('complete survey flow stores 5 questions and answers', function () {
+test('complete survey flow stores 4 questions and answers', function () {
     $event = Event::factory()->create([
         'name' => 'TechConf 2026',
         'description' => 'A technology conference showcasing the latest innovations.',
     ]);
 
     SurveyAgent::fake([
-        'Welcome to TechConf 2026! What is your name and what do you do?',
-        'Great to meet you! What brings you to our event today?',
-        'Interesting! What specific technologies are you most interested in?',
-        'What is your timeline for implementing a solution?',
-        'How can our team best follow up with you?',
-        'Thanks so much for your time! We will reach out soon. [SURVEY_COMPLETE]',
+        'Welcome to TechConf 2026! We have 5 tracks including AI and Cloud. What brings you here today?',
+        'Great choice! Our AI track features hands-on workshops. What specific technologies interest you most?',
+        'We have several NLP and computer vision demos at the AI booth. What is your timeline for exploring solutions?',
+        'Perfect — I recommend visiting the AI Demo Station and Cloud Infrastructure booth. How can we best follow up?',
+        'Thanks so much for chatting! I will send you the info on those booths. Enjoy the conference! [SURVEY_COMPLETE]',
     ]);
 
     // Start session
@@ -26,21 +25,20 @@ test('complete survey flow stores 5 questions and answers', function () {
 
     $response->assertOk()
         ->assertJsonPath('status', 'active')
-        ->assertJsonPath('message', 'Welcome to TechConf 2026! What is your name and what do you do?');
+        ->assertJsonPath('message', 'Welcome to TechConf 2026! We have 5 tracks including AI and Cloud. What brings you here today?');
 
     $sessionId = $response->json('session_id');
 
-    // Answer 5 questions
+    // Answer 4 questions (completes on the 4th)
     $answers = [
-        'Jane Smith, CTO at Acme Corp',
-        'Looking for AI solutions for our customer support',
-        'NLP and conversational AI',
-        'We are looking to implement within 3 months',
-        'Email me at jane@acme.com',
+        'Looking for AI solutions for our customer support team',
+        'NLP and conversational AI are our top priorities',
+        'We want to implement within the next 3 months',
+        'Email me at jane@acme.com and send booth info',
     ];
 
     foreach ($answers as $i => $answer) {
-        $status = $i === 4 ? 'completed' : 'active';
+        $status = $i === 3 ? 'completed' : 'active';
         $this->postJson("/api/survey/{$sessionId}/answer", [
             'answer' => $answer,
         ])->assertOk()
@@ -48,12 +46,21 @@ test('complete survey flow stores 5 questions and answers', function () {
     }
 
     // Verify database state
-    $this->assertDatabaseCount('session_questions', 5);
-    $this->assertDatabaseCount('session_answers', 5);
+    $this->assertDatabaseCount('session_questions', 4);
+    $this->assertDatabaseCount('session_answers', 4);
 
     $session = VisitorSession::find($sessionId);
     expect($session->status)->toBe('completed');
     expect($session->completed_at)->not->toBeNull();
+});
+
+test('survey page shows four question maximum', function () {
+    $event = Event::factory()->create();
+
+    $this->get(route('survey.chat', $event))
+        ->assertOk()
+        ->assertSee('Question 1 of 4')
+        ->assertDontSee('Question 1 of 5');
 });
 
 test('survey start requires valid event', function () {

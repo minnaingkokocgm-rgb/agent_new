@@ -41,7 +41,7 @@ class GenerateSummary
         }
 
         // Find the outermost { } block if there's extra text
-        if (!str_starts_with($text, '{')) {
+        if (! str_starts_with($text, '{')) {
             if (preg_match('/\{.+\}/s', $text, $m)) {
                 $text = $m[0];
             }

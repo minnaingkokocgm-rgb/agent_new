@@ -12,6 +12,7 @@ class StartSurveyRequest extends FormRequest
         return [
             'event_id' => ['required', 'integer', 'exists:events,id'],
             'booth_id' => ['nullable', 'integer', 'exists:booths,id'],
+            'visitor_id' => ['nullable', 'integer', 'exists:visitors,id'],
         ];
     }
 }

@@ -8,10 +8,10 @@ class SurveyPageController extends Controller
 {
     public function chat(Event $event)
     {
-        // TODO: Implement Blade view for survey chat
         return view('survey.chat', [
             'event' => $event->only('id', 'name', 'description'),
             'booth' => null,
+            'visitorId' => request()->integer('visitor_id') ?: null,
         ]);
     }
 
@@ -19,10 +19,10 @@ class SurveyPageController extends Controller
     {
         $booth = $event->booths()->findOrFail($boothId);
 
-        // TODO: Implement Blade view for survey chat with booth
         return view('survey.chat', [
             'event' => $event->only('id', 'name', 'description'),
             'booth' => $booth->only('id', 'name'),
+            'visitorId' => request()->integer('visitor_id') ?: null,
         ]);
     }
 

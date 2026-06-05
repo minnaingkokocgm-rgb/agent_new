@@ -25,19 +25,19 @@ class ProcessAnswer
 
         $questionCount = $session->questions()->count();
 
-        // After 5 questions, complete the session
-        if ($questionCount >= 5) {
+        // After 4 exchanges, complete the session
+        if ($questionCount >= 4) {
             $session->update([
                 'status' => 'completed',
                 'completed_at' => now(),
             ]);
 
-            $agent = SurveyAgent::make($session->event, $session->booth)
+            $agent = SurveyAgent::make($session->event, $session->booth, $session->visitor->name ? $session->visitor : null)
                 ->continueLastConversation($session->visitor);
 
             $response = $agent->prompt(
-                "The visitor's final answer was: \"{$answer}\". "
-                .'We have reached 5 questions. Thank the visitor warmly and end the conversation with [SURVEY_COMPLETE].'
+                "The visitor said: \"{$answer}\". "
+                .'Wrap up the conversation warmly, offer a helpful pointer, and end with [SURVEY_COMPLETE].'
             );
 
             return [
@@ -46,12 +46,12 @@ class ProcessAnswer
             ];
         }
 
-        // Ask the next question
-        $agent = SurveyAgent::make($session->event, $session->booth)
+        // Continue the conversation naturally
+        $agent = SurveyAgent::make($session->event, $session->booth, $session->visitor->name ? $session->visitor : null)
             ->continueLastConversation($session->visitor);
 
         $response = $agent->prompt(
-            "The visitor answered: \"{$answer}\". Ask your next question."
+            "The visitor said: \"{$answer}\". Respond naturally — answer any questions using the knowledge tool if needed, then continue the conversation."
         );
 
         $nextOrder = $questionCount + 1;

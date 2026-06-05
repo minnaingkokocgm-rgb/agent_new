@@ -12,11 +12,15 @@ use Illuminate\Support\Str;
 
 class StartSurveySession
 {
-    public function handle(Event $event, ?Booth $booth = null): array
+    public function handle(Event $event, ?Booth $booth = null, ?int $visitorId = null): array
     {
-        $visitor = Visitor::create([
-            'session_token' => (string) Str::uuid7(),
-        ]);
+        if ($visitorId) {
+            $visitor = Visitor::findOrFail($visitorId);
+        } else {
+            $visitor = Visitor::create([
+                'session_token' => (string) Str::uuid7(),
+            ]);
+        }
 
         $session = VisitorSession::create([
             'visitor_id' => $visitor->id,
@@ -26,11 +30,11 @@ class StartSurveySession
             'started_at' => now(),
         ]);
 
-        $agent = SurveyAgent::make($event, $booth)
+        $agent = SurveyAgent::make($event, $booth, $visitor->name ? $visitor : null)
             ->forUser($visitor);
 
         $response = $agent->prompt(
-            'Start the survey conversation. Greet the visitor warmly and ask your first question.'
+            'A visitor just arrived. Greet them warmly and ask one simple opening question.'
         );
 
         $question = SessionQuestion::create([
