@@ -1,0 +1,131 @@
+---
+title: AI Event Booth RAG Survey System Flow
+---
+
+flowchart TD
+    %% Overall visitor journey
+    subgraph VisitorJourney["Visitor Journey: Registration to Survey"]
+        A["Visitor opens registration page"] --> B["Blade registration page loads"]
+        B --> C["POST /api/registration/start"]
+        C --> D["Create pending Registration with session_token"]
+        D --> E["RegistrationAssistantAgent starts conversation"]
+        E --> F["Visitor fills form and may ask AI questions"]
+        F --> G["POST /api/registration/ask"]
+        G --> H["RegistrationAssistantAgent continues conversation"]
+        H --> F
+        F --> I["POST /api/registration/submit"]
+        I --> J["Create Visitor from registration data"]
+        J --> K["Update Registration: visitor_id and status=submitted"]
+        K --> L["Return visitor_id"]
+        L --> M["Redirect to survey page with visitor_id"]
+        M --> N["Survey chat page loads"]
+    end
+
+    %% Survey session flow
+    subgraph SurveyFlow["Survey Session Logic"]
+        N --> O["POST /api/survey/start with event_id, optional booth_id, visitor_id"]
+        O --> P{"visitor_id provided?"}
+        P -- "Yes" --> Q["Load existing registered Visitor"]
+        P -- "No" --> R["Create anonymous Visitor with UUID7 session_token"]
+        Q --> SS["Create VisitorSession status=active"]
+        R --> SS
+        SS --> T["SurveyAgent make event, booth, visitor if named"]
+        T --> U["forUser visitor: start remembered AI conversation"]
+        U --> V["Prompt greeting and one opening question"]
+        V --> W["Store SessionQuestion order 1"]
+        W --> X["Return AI message to frontend"]
+
+        X --> Y["Visitor submits answer"]
+        Y --> Z["POST /api/survey/session/answer"]
+        Z --> AA["Store SessionAnswer for current question"]
+        AA --> AB{"question count >= 4?"}
+        AB -- "No" --> AC["SurveyAgent continues last conversation"]
+        AC --> AD["Prompt: respond naturally and use knowledge tool if needed"]
+        AD --> AE["Store next SessionQuestion"]
+        AE --> Y
+        AB -- "Yes" --> AF["Mark VisitorSession completed"]
+        AF --> AG["Prompt final wrap-up ending with SURVEY_COMPLETE marker"]
+        AG --> AH["Frontend shows completed state"]
+    end
+
+    %% RAG knowledge retrieval
+    subgraph RAGFlow["RAG Logic: EventKnowledgeSearch"]
+        R1["AI agent receives visitor question or survey answer"] --> R2{"Event, product, booth, or schedule topic?"}
+        R2 -- "No" --> R3["Answer from conversation context only"]
+        R2 -- "Yes" --> R4["Call EventKnowledgeSearch tool with query"]
+        R4 --> R5["Generate embedding via OpenRouter text-embedding-3-small"]
+        R5 --> R6["Vector search knowledge_chunks"]
+        R6 --> R7{"Booth scoped survey?"}
+        R7 -- "No" --> R8["Filter: event_id equals current event"]
+        R7 -- "Yes" --> R9["Filter: current event and booth-specific or event-wide chunks"]
+        R8 --> R10["Vector similarity threshold >= 0.1"]
+        R9 --> R10
+        R10 --> R11["Limit to 5 relevant chunks"]
+        R11 --> R12{"Chunks found?"}
+        R12 -- "Yes" --> R13["Return concatenated chunk_text to agent"]
+        R12 -- "No" --> R14["Return no relevant information found"]
+        R13 --> R15["Agent answers using retrieved knowledge"]
+        R14 --> R16["Agent says detail unavailable and suggests booth, organizer, or matching service"]
+    end
+
+    %% Admin knowledge indexing
+    subgraph AdminKnowledge["Admin Knowledge Base Indexing"]
+        K1["Admin opens event dashboard"] --> K2["Upload knowledge via POST /api/events/event/knowledge"]
+        K2 --> K3["IndexKnowledge action"]
+        K3 --> K4["Split uploaded text into chunks"]
+        K4 --> K5["Generate embeddings for chunks"]
+        K5 --> K6["Store KnowledgeChunk records"]
+        K6 --> K7[("knowledge_chunks table with pgvector embedding")]
+        K7 --> R6
+    end
+
+    %% Conversation memory
+    subgraph MemoryFlow["Laravel AI Conversation Memory"]
+        M1["Agent uses RemembersConversations"] --> M2{"New or existing conversation?"}
+        M2 -- "New" --> M3["forUser model creates conversation for participant_id"]
+        M2 -- "Existing" --> M4["continueLastConversation loads latest conversation"]
+        M3 --> M5["RememberConversation middleware stores user prompt"]
+        M4 --> M5
+        M5 --> M6["LLM response generated"]
+        M6 --> M7["Middleware stores assistant response"]
+        M7 --> M8[("agent_conversations and agent_conversation_messages")]
+        M8 --> M4
+    end
+
+    %% Summary generation
+    subgraph SummaryFlow["AI Summary Logic"]
+        S1["Admin opens event, booth, or visitor summary"] --> S2["GET summary API endpoint"]
+        S2 --> S3{"Cached Summary exists?"}
+        S3 -- "Yes" --> S4["Return cached summary"]
+        S3 -- "No" --> S5["GenerateSummary action"]
+        S5 --> S6["Load sessions, questions, answers, and visitor data"]
+        S6 --> S7["SummarizationAgent with low temperature"]
+        S7 --> S8["Generate JSON-like plain text summary"]
+        S8 --> S9["Store Summary record"]
+        S9 --> S4
+        S10["POST regenerate summary endpoint"] --> S5
+    end
+
+    %% Data stores
+    DB1[("events")]
+    DB2[("booths")]
+    DB3[("registrations")]
+    DB4[("visitors")]
+    DB5[("visitor_sessions")]
+    DB6[("session_questions")]
+    DB7[("session_answers")]
+    DB8[("knowledge_chunks with pgvector")]
+    DB9[("summaries")]
+
+    D --> DB3
+    K --> DB3
+    J --> DB4
+    SS --> DB5
+    W --> DB6
+    AE --> DB6
+    AA --> DB7
+    K6 --> DB8
+    R6 --> DB8
+    S9 --> DB9
+    O --> DB1
+    O --> DB2

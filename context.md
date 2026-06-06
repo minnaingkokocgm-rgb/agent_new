@@ -36,7 +36,7 @@ Tests use `survey_test` — separate from dev `survey`. Dev data survives test r
 | Database | PostgreSQL 17 + pgvector (Docker) |
 | AI | Laravel AI SDK → OpenRouter (`openai/gpt-4o`, `text-embedding-3-small`) |
 | Auth | Laravel Fortify v1 (login, register, passkeys, 2FA, email verify) |
-| Testing | Pest 4 (70 tests, all passing) |
+| Testing | Pest 4 (72 tests, all passing) |
 
 ### Frontend Dependencies (CDN-loaded in `layouts/app.blade.php`)
 - Bootstrap 5.3.3 CSS + JS Bundle
@@ -265,7 +265,7 @@ Docker creates `survey_test` via `docker/init-test-db.sql` on container startup.
 ## Running Tests
 
 ```bash
-php artisan test --compact              # All 70 tests (isolated DB, dev data safe)
+php artisan test --compact              # All 72 tests (isolated DB, dev data safe)
 php artisan test --compact --filter=SurveyFlow       # Specific test
 php artisan test --compact --filter=RegistrationFlow # Registration flow tests
 ```

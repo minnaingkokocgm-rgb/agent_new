@@ -117,42 +117,22 @@ Built in `app/Ai/Agents/SurveyAgent.php::instructions()`. Hardcoded template wit
 | `$this->booth->description` | `booths.description` | `"What the booth showcases"` (booth-scoped only) |
 | Visitor info | `visitors.name`, `company`, `job_title` | `"Visitor: John Smith (Software Engineer at Acme Corp)"` — only when visitor has a name |
 
-### Actual System Prompt (from code)
+### Actual System Prompt Summary (from code)
 
-```
-You are a friendly host at "{event.name}"{boothContext}.{visitorInfo}{boothInfo}
+The current `SurveyAgent` prompt defines a dual role:
 
-Event description: {event.description}
+1. **SURVEY** — gather structured insights about sourcing needs, product/category interests, budget, timeline, decision process, and follow-up preferences.
+2. **HELPER** — answer event, booth, product, schedule, and logistics questions using the `EventKnowledgeSearch` tool.
 
-YOUR ROLE:
-Have a natural, helpful conversation with the visitor. Greet them, learn what interests
-them, answer their questions, and guide them. Be warm and concise — not pushy, not scripted.
+The prompt instructs the agent to:
 
-HOW TO START:
-- Greet the visitor warmly in 1-2 sentences. Ask ONE simple opening question (what brings
-  them here, what caught their eye, what they're curious about).
-- Do NOT dump a wall of event info. Keep the greeting light.
-
-DURING THE CONVERSATION:
-- When the visitor asks about the event, booths, products, schedule, or any event-related
-  topic, use the EventKnowledgeSearch tool to find accurate information and answer helpfully.
-- After answering, you may ask a natural follow-up question to learn more about their
-  interests — but don't force it. If they just want info, that's fine.
-- If relevant, mention other booths, sessions, or resources they might find useful.
-- Keep responses brief (2-4 sentences). Don't monologue.
-
-ENDING:
-- After 3-4 exchanges, wrap up naturally. Thank them, offer a helpful pointer, and end
-  with "[SURVEY_COMPLETE]".
-- Don't drag the conversation on. If they seem done, let them go.
-
-RULES:
-- ONE question at a time, if you ask one. Don't stack questions.
-- Always use the knowledge tool when answering event-related questions.
-- Be responsive: if they ask a question, answer it before asking yours.
-- If the visitor info is provided, never ask for name/company/job title.
-- Do NOT rapid-fire questions. Do NOT give long monologues.
-```
+- Greet warmly and ask one opening question about what the visitor is looking for.
+- Never ask for name, company, job title, email, phone, or country because these come from registration.
+- Use `EventKnowledgeSearch` whenever the visitor mentions a product, zone, or event topic.
+- Answer visitor questions first, then ask one survey question.
+- Keep responses to 2-4 sentences.
+- Complete after 3-4 exchanges with `[SURVEY_COMPLETE]`.
+- Gather deeper insights across the conversation: interests, needs, budget/timeline, decision criteria, and follow-up preferences.
 
 ### Agent Configuration
 
@@ -261,7 +241,7 @@ Agent decides to call: EventKnowledgeSearch(query="what products do you have")
          $q->where('booth_id', $this->booth->id)  // booth-specific chunks
            ->orWhereNull('booth_id');             // PLUS event-wide chunks
      }))
-     ->whereVectorSimilarTo('embedding', $queryEmbedding, 0.6)  // similarity ≥ 0.6
+     ->whereVectorSimilarTo('embedding', $queryEmbedding, 0.1)  // similarity ≥ 0.1
      ->limit(5)
      ->get()
 
@@ -434,6 +414,6 @@ $response = $agent->prompt(
 1. **Hardcoded 4-exchange limit** — Not configurable per event. Always completes after `$questionCount >= 4`.
 2. **No knowledge caching** — Every `EventKnowledgeSearch` call re-embeds and re-searches, even for repeated queries.
 3. **Anonymous visitors** — `Visitor` record created with only a `session_token` (no name/email until registration or survey captures it).
-4. **Frontend counter says "5"** — `chat.blade.php` shows "Question X of 5" but backend completes at 4 exchanges. This is a UX inconsistency.
+4. **Registration form required-field mismatch** — the UI/assistant labels company and job title as required, but backend validation currently allows them as nullable.
 5. **Chat UI code duplication** — Survey chat (`chat.blade.php`) and registration chat (`register.blade.php` chat panel) use similar but separate code for chat bubbles, typing indicators, and AJAX handling.
 6. **No idle timeout** — Survey sessions have no auto-expiry or idle disconnect UI.
