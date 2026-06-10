@@ -1,6 +1,8 @@
 # Context — AI-Powered Event/Booth RAG Survey System
 
-> Generated 2026-06-02 after major frontend migration and registration feature addition. Use this to recover context in a new session.
+> Generated 2026-06-02 after major frontend migration and registration feature addition.
+> Last updated 2026-06-10 — removed Vite/Tailwind cruft, fixed stale doc references.
+> Use this to recover context in a new session.
 
 ---
 
@@ -10,10 +12,8 @@
 # 1. Start PostgreSQL
 docker compose up -d
 
-# 2. Build & serve
-npm run build
+# 2. Serve
 php artisan serve &
-npm run dev &
 
 # 3. Open: http://localhost:8000/admin/events
 #    Login: test@example.com / password
@@ -30,46 +30,55 @@ Tests use `survey_test` — separate from dev `survey`. Dev data survives test r
 
 | Layer | Technology |
 |---|---|
-| Backend | Laravel 13, PHP 8.5 |
+| Backend | Laravel 13.12, PHP 8.5 |
 | Frontend | **Blade templates + Bootstrap 5.3 + jQuery 3.7.1** (was Inertia/React/Tailwind) |
-| CSS | Custom `public/css/app.css` + Bootstrap CDN + Bootstrap Icons CDN |
+| CSS | Hand-written `public/css/app.css` + Bootstrap 5.3 CDN + Bootstrap Icons CDN |
 | Database | PostgreSQL 17 + pgvector (Docker) |
-| AI | Laravel AI SDK → OpenRouter (`openai/gpt-4o`, `text-embedding-3-small`) |
-| Auth | Laravel Fortify v1 (login, register, passkeys, 2FA, email verify) |
-| Testing | Pest 4 (72 tests, all passing) |
+| AI | Laravel AI SDK v0.7.2 → OpenRouter (`openai/gpt-4o`, `text-embedding-3-small`) |
+| Auth | Laravel Fortify v1.37.2 (login, register, passkeys, 2FA, email verify) |
+| Testing | Pest 4.7 (72 tests, all passing) |
 
-### Frontend Dependencies (CDN-loaded in `layouts/app.blade.php`)
-- Bootstrap 5.3.3 CSS + JS Bundle
-- Bootstrap Icons 1.11.3
-- jQuery 3.7.1
-- Axios 1.7.9
+### Frontend Dependencies
+- **CDN-loaded** (in `layouts/app.blade.php`): Bootstrap 5.3.3 CSS + JS, Bootstrap Icons 1.11.3, jQuery 3.7.1, Axios 1.7.9
+- **Local**: `public/css/app.css` (126 lines, hand-written custom CSS for chat bubbles, survey layout, event cards, etc.)
 
-Vite still processes `resources/css/app.css` and `resources/js/app.js` (Tailwind v4 available but Bootstrap is primary).
+### npm package (`package.json`)
+- `concurrently` v9 — used by `composer run dev` to run server + queue together
+
+**Note:** Inertia, Wayfinder, Sail, Vite, Tailwind, and React are **not installed** (removed during/after the Blade migration).
 
 ---
 
 ## Major Changes Since Last Context
 
 ### 1. Frontend Migration: Inertia+React → Blade+Bootstrap
-All pages are now **server-rendered Blade views** with Bootstrap 5 instead of client-side Inertia+React+Tailwind. The Inertia middleware and React components (`resources/js/pages/`) have been replaced by Blade templates under `resources/views/`.
+All pages are now **server-rendered Blade views** with Bootstrap 5 instead of client-side Inertia+React+Tailwind. The Inertia middleware and React components (`resources/js/pages/`) have been replaced by Blade templates under `resources/views/`. Vite, Tailwind, and `vite.config.js` have been removed (2026-06-10) — the app uses CDN-loaded Bootstrap + hand-written `public/css/app.css` exclusively.
 
-### 2. New Feature: Visitor Registration with AI Assistant
+### 2. Visitor Registration with AI Assistant
 A full registration system with an AI chat assistant sidebar:
-- **Registration page**: Split layout — form on the left (name, email, phone, company, job title, country, source, notes), AI assistant chat on the right
+- **Registration page**: Split layout — form on the left (comprehensive fields: 9 occupations, 7 age ranges, location, etc.), AI assistant chat on the right
+- **Form fields**: name, email, phone, company, organization, job_title, occupation (9 categories), age_range (7 ranges), post_code, address, country, source, notes, opt_out
 - **AI Assistant**: `RegistrationAssistantAgent` answers questions about the form and event, uses `EventKnowledgeSearch` tool
-- **Flow**: Visitor opens form → AI greets them → they can ask questions while filling → submit → redirect to thank-you page
+- **Flow**: Visitor opens form → AI greets them → they can ask questions while filling → submit → redirect to survey with visitor_id
 - **API**: `POST /api/registration/start` → `POST /api/registration/ask` → `POST /api/registration/submit`
 
-### 3. New AI Agent: RegistrationAssistantAgent
+### 3. Dynamic Survey Targeting
+SurveyAgent now adapts questions based on visitor registration data:
+- **Occupation-based strategies**: Different question focus for company owners (ROI/partnerships), employees (approval process), sole proprietors (niche/cost), investors (market trends), students (learning/career), retirees (hobbies/community), etc.
+- **Age-based adjustments**: Young visitors → innovation/trends, mid-career → business value, experienced → quality/reliability, seniors → patience/enjoyment
+- **Greeting fix**: Agent no longer repeats "Welcome to [event]" in every exchange; explicit instructions prevent re-greetings
+
+### 4. RegistrationAssistantAgent
 - Model: `openai/gpt-4o`, temp 0.7, max 8 steps, max 1024 tokens
 - Traits: `Promptable`, `RemembersConversations`
 - Tools: `EventKnowledgeSearch`
 - Purpose: Helps visitors understand the registration form and event details
 
-### 4. New Model: `Registration`
-- Fields: event_id, name, email, phone, company, job_title, country, source, notes, document_path, session_token, status, metadata (jsonb)
+### 5. Registration Model
+- Fields: event_id, name, email, phone, company, organization, job_title, occupation, age_range, post_code, address, country, source, notes, opt_out, document_path, session_token, status, metadata (jsonb), visitor_id
 - Uses `session_token` (UUID7) for AI chat session tracking
 - Status flow: `pending` → `submitted`
+- Creates and links to Visitor record on submit
 
 ---
 
@@ -121,7 +130,9 @@ resources/views/
 - Model: `openai/gpt-4o`, temp 0.7, max 12 steps, max 1024 tokens
 - Traits: `Promptable`, `RemembersConversations`
 - Tools: `EventKnowledgeSearch`
-- Asks 4-5 adaptive questions, ends with `[SURVEY_COMPLETE]`
+- **Dynamic targeting**: Builds occupation-specific survey strategy (8 occupation types) + age-based adjustments
+- Asks 3-4 adaptive questions tailored to visitor profile, ends with `[SURVEY_COMPLETE]`
+- **No repeated greetings**: Explicit instructions prevent re-greeting in subsequent exchanges
 
 ### SummarizationAgent (`app/Ai/Agents/SummarizationAgent.php`)
 - Model: `openai/gpt-4o`, temp 0.3
@@ -224,25 +235,33 @@ Docker creates `survey_test` via `docker/init-test-db.sql` on container startup.
 
 ## Key Files
 
+### 2026-06-10 — Vite/Tailwind Removal
+- Removed `vite`, `tailwindcss`, `@tailwindcss/vite`, `laravel-vite-plugin` from `package.json`
+- Deleted `vite.config.js`, `resources/js/app.js`, `resources/css/app.css`, `public/build/`
+- Updated `composer.json` dev/setup scripts to no longer reference npm build/dev
+- App now exclusively uses CDN Bootstrap + hand-written `public/css/app.css`
+
 ### New / Changed This Session
-- `context.md` — this file, fully updated for Blade+Bootstrap migration
-- `resources/views/layouts/app.blade.php` — Bootstrap 5 navbar, jQuery, Axios
-- `resources/views/survey/register.blade.php` — Registration form + AI chat
-- `resources/views/survey/register-complete.blade.php` — Registration thank-you
-- `app/Ai/Agents/RegistrationAssistantAgent.php` — New AI agent
-- `app/Models/Registration.php` — New model
-- `app/Http/Controllers/Api/RegistrationController.php` — New API controller
-- `database/migrations/2026_06_02_000001_create_registrations_table.php` — New migration
-- `tests/Feature/RegistrationFlowTest.php` — New tests
-- `public/css/app.css` — Custom CSS (chat bubbles, typing dots, survey page)
+- `context.md` — updated with registration fields, dynamic targeting, greeting fix
+- `app/Ai/Agents/SurveyAgent.php` — added `buildTargetingStrategy()` for occupation/age-based survey adaptation
+- `app/Actions/StartSurveySession.php` — updated prompt to prevent generic greetings
+- `app/Actions/ProcessAnswer.php` — updated prompts to prevent repeated greetings
+- `app/Http/Controllers/Api/RegistrationController.php` — validates new form fields (post_code, address, organization, occupation, age_range, opt_out)
+- `app/Models/Registration.php` — added new fields to fillable
+- `app/Models/Visitor.php` — added new fields to fillable
+- `resources/views/survey/register.blade.php` — comprehensive form with occupation/age dropdowns, location fields, opt-out checkbox
+- `database/migrations/2026_06_07_102502_add_form_fields_to_registrations_and_visitors.php` — adds post_code, address, organization, occupation, age_range, opt_out
+- `tests/Feature/RegistrationFlowTest.php` — updated to test new fields
+
+### Reference Docs
+- `docs/jfex-survey-simulation.md` — JFEX survey simulation guide
+- `docs/survey-agent-interview-only-system-prompt-2026-06-05.md` — archived system prompt variant
+- `docs/survey-agent-system-prompt-backup-2026-06-05.md` — system prompt backup
 
 ### Previous Session (still relevant)
 - `app/Http/Responses/LoginResponse.php`
 - `app/Http/Responses/RegisterResponse.php`
 - `docker/init-test-db.sql`
-- `docs/event-management-guide.md`
-- `docs/knowledge-base-techconf-2026.md`
-- `docs/knowledge-base-devtool-ai-booth-101.md`
 
 ---
 

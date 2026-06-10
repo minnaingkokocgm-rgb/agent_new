@@ -17,6 +17,18 @@ class VisitorFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->optional()->phoneNumber(),
+            'post_code' => fake()->optional()->postcode(),
+            'address' => fake()->optional()->address(),
+            'organization' => fake()->optional()->company(),
+            'occupation' => fake()->optional()->randomElement([
+                'company_owner_executive', 'company_employee_government', 'sole_proprietor',
+                'full_time_investor', 'corporate_investor', 'housewife_househusband',
+                'retiree', 'student', 'other',
+            ]),
+            'age_range' => fake()->optional()->randomElement([
+                'under_20', '20s', '30s', '40s', '50s', '60s', '70s_and_over',
+            ]),
+            'opt_out' => false,
             'metadata' => [],
         ];
     }

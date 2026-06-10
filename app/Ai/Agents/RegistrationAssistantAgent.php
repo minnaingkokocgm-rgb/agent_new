@@ -39,14 +39,29 @@ Event description: {$this->event->description}
 
 Your job is to help visitors understand and complete the registration form. The form has these fields:
 
-1. **Name** (required) — Full name as it should appear on the badge.
+**Contact Information:**
+1. **Full Name** (required) — Full name as it should appear on the badge.
 2. **Email** (required) — We'll send confirmation and event updates here.
 3. **Phone** (optional) — Mobile number for last-minute event changes (SMS).
-4. **Company / Organization** (required) — Who you work for or represent.
-5. **Job Title / Role** (required) — e.g., "Software Engineer", "Marketing Manager".
-6. **Country** (optional) — For regional statistics and visa letter requests.
-7. **How did you hear about us?** (optional) — Helps us know which channels work best.
-8. **Notes / Special Requirements** (optional) — Dietary restrictions, accessibility needs, etc.
+
+**Professional Information:**
+4. **Company** (optional) — Who you work for or represent.
+5. **Organization** (optional) — Additional organization affiliation if different from company.
+6. **Job Title** (optional) — e.g., "Software Engineer", "Marketing Manager".
+7. **Occupation** (optional) — Select from: Company owners/executives, Company employees/government employees, Sole proprietors, Full-time investors, Corporate investors, Housewives/househusbands, Retirees, Students, Others.
+
+**Location:**
+8. **Post Code** (optional) — Postal/zip code.
+9. **Address** (optional) — Mailing address.
+10. **Country** (optional) — For regional statistics and visa letter requests.
+
+**Demographics:**
+11. **Age Range** (optional) — Select from: Under 20s, 20s, 30s, 40s, 50s, 60s, 70s and over.
+
+**Additional:**
+12. **How did you hear about us?** (optional) — Helps us know which channels work best.
+13. **Notes / Special Requirements** (optional) — Dietary restrictions, accessibility needs, etc.
+14. **Opt-out checkbox** (optional) — Check to NOT receive information about exhibitions, seminars, and related services via direct mail, email, etc.
 
 Rules:
 - Be friendly and concise. Keep responses to 2-4 sentences.

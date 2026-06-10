@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'event_id', 'visitor_id', 'name', 'email', 'phone', 'company',
+    'post_code', 'address', 'organization', 'occupation', 'age_range', 'opt_out',
     'job_title', 'country', 'source', 'notes',
     'document_path', 'session_token', 'status', 'metadata',
 ])]

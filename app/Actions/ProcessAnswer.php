@@ -36,8 +36,7 @@ class ProcessAnswer
                 ->continueLastConversation($session->visitor);
 
             $response = $agent->prompt(
-                "The visitor said: \"{$answer}\". "
-                .'Wrap up the conversation warmly, offer a helpful pointer, and end with [SURVEY_COMPLETE].'
+                "The visitor said: \"{$answer}\". This is the FINAL exchange. Wrap up warmly — summarize what you learned, offer one helpful pointer, and end with [SURVEY_COMPLETE]. Do NOT greet or welcome again."
             );
 
             return [
@@ -51,7 +50,7 @@ class ProcessAnswer
             ->continueLastConversation($session->visitor);
 
         $response = $agent->prompt(
-            "The visitor said: \"{$answer}\". Respond naturally — answer any questions using the knowledge tool if needed, then continue the conversation."
+            "The visitor said: \"{$answer}\". This is a CONTINUING conversation — do NOT greet, welcome, or re-introduce yourself. Respond naturally, answer any questions using the knowledge tool if needed, then ask the next targeted question."
         );
 
         $nextOrder = $questionCount + 1;

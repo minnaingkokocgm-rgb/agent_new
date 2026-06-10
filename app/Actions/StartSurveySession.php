@@ -34,7 +34,7 @@ class StartSurveySession
             ->forUser($visitor);
 
         $response = $agent->prompt(
-            'A visitor just arrived. Greet them warmly and ask one simple opening question.'
+            'A visitor just arrived. This is your FIRST and ONLY greeting. Give a brief, warm acknowledgment and ask one tailored opening question based on their profile. Do NOT use generic phrases like "Welcome to [event name]" — be natural and personal.'
         );
 
         $question = SessionQuestion::create([

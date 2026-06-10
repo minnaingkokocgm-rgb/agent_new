@@ -113,12 +113,24 @@
                 </div>
             </div>
 
+            <div class="form-section-title mt-4">
+                <i class="bi bi-geo-alt"></i> Location
+            </div>
+
             <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="phone" class="form-label">Phone Number <small class="text-muted">(optional)</small></label>
-                    <input type="text" name="phone" id="phone" class="form-control"
-                        placeholder="+1-555-123-4567">
+                <div class="col-md-4">
+                    <label for="post_code" class="form-label">Post Code <small class="text-muted">(optional)</small></label>
+                    <input type="text" name="post_code" id="post_code" class="form-control"
+                        placeholder="Postal/ZIP code">
                 </div>
+                <div class="col-md-8">
+                    <label for="address" class="form-label">Address <small class="text-muted">(optional)</small></label>
+                    <input type="text" name="address" id="address" class="form-control"
+                        placeholder="Mailing address">
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label for="country" class="form-label">Country <small class="text-muted">(optional)</small></label>
                     <select name="country" id="country" class="form-select">
@@ -146,14 +158,57 @@
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label for="company" class="form-label">Company / Organization <span class="text-danger">*</span></label>
+                    <label for="company" class="form-label">Company <small class="text-muted">(optional)</small></label>
                     <input type="text" name="company" id="company" class="form-control"
                         placeholder="Where you work">
                 </div>
                 <div class="col-md-6">
-                    <label for="job_title" class="form-label">Job Title / Role <span class="text-danger">*</span></label>
+                    <label for="organization" class="form-label">Organization <small class="text-muted">(optional)</small></label>
+                    <input type="text" name="organization" id="organization" class="form-control"
+                        placeholder="Additional affiliation">
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="job_title" class="form-label">Job Title <small class="text-muted">(optional)</small></label>
                     <input type="text" name="job_title" id="job_title" class="form-control"
                         placeholder="e.g. Software Engineer, CTO">
+                </div>
+                <div class="col-md-6">
+                    <label for="occupation" class="form-label">Occupation <small class="text-muted">(optional)</small></label>
+                    <select name="occupation" id="occupation" class="form-select">
+                        <option value="">Select occupation...</option>
+                        <option value="company_owner_executive">Company owners/executives</option>
+                        <option value="company_employee_government">Company employees/government employees</option>
+                        <option value="sole_proprietor">Sole proprietors</option>
+                        <option value="full_time_investor">Full-time investors</option>
+                        <option value="corporate_investor">Corporate investors</option>
+                        <option value="housewife_househusband">Housewives/househusbands</option>
+                        <option value="retiree">Retirees</option>
+                        <option value="student">Students</option>
+                        <option value="other">Others</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section-title mt-4">
+                <i class="bi bi-person-circle"></i> Demographics
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="age_range" class="form-label">Age Range <small class="text-muted">(optional)</small></label>
+                    <select name="age_range" id="age_range" class="form-select">
+                        <option value="">Select age range...</option>
+                        <option value="under_20">Under 20s</option>
+                        <option value="20s">20s</option>
+                        <option value="30s">30s</option>
+                        <option value="40s">40s</option>
+                        <option value="50s">50s</option>
+                        <option value="60s">60s</option>
+                        <option value="70s_and_over">70s and over</option>
+                    </select>
                 </div>
             </div>
 
@@ -180,13 +235,22 @@
                     placeholder="Dietary restrictions, accessibility needs, questions for organizers..."></textarea>
             </div>
 
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="opt_out" id="opt_out" value="1">
+                    <label class="form-check-label small" for="opt_out">
+                        I do not wish to receive information about exhibitions, seminars, and related services via direct mail, email, etc.
+                    </label>
+                </div>
+            </div>
+
             <div id="formAlert" class="alert d-none"></div>
 
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
                     <i class="bi bi-check-lg"></i> Submit Registration
                 </button>
-                <button type="button" class="btn btn-outline-secondary btn-lg" id="resetBtn">
+                <button type="button" class="btn btn-outline-secondary" id="resetBtn">
                     Reset Form
                 </button>
             </div>
@@ -316,6 +380,12 @@ $(function() {
                 email: $('#email').val(),
                 phone: $('#phone').val(),
                 company: $('#company').val(),
+                post_code: $('#post_code').val(),
+                address: $('#address').val(),
+                organization: $('#organization').val(),
+                occupation: $('#occupation').val(),
+                age_range: $('#age_range').val(),
+                opt_out: $('#opt_out').is(':checked'),
                 job_title: $('#job_title').val(),
                 country: $('#country').val(),
                 source: $('#source').val(),

@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['session_token', 'name', 'email', 'phone', 'company', 'job_title', 'country', 'metadata'])]
+#[Fillable([
+    'session_token', 'name', 'email', 'phone', 'company',
+    'post_code', 'address', 'organization', 'occupation', 'age_range', 'opt_out',
+    'job_title', 'country', 'metadata',
+])]
 class Visitor extends Model
 {
     /** @use HasFactory<VisitorFactory> */

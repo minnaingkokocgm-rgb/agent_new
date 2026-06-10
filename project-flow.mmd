@@ -14,7 +14,7 @@ flowchart TD
         G --> H["RegistrationAssistantAgent continues conversation"]
         H --> F
         F --> I["POST /api/registration/submit"]
-        I --> J["Create Visitor from registration data"]
+        I --> J["Create Visitor from registration data\n(name, email, phone, company, organization,\njob_title, occupation, age_range, post_code,\naddress, country, opt_out)"]
         J --> K["Update Registration: visitor_id and status=submitted"]
         K --> L["Return visitor_id"]
         L --> M["Redirect to survey page with visitor_id"]
@@ -29,9 +29,9 @@ flowchart TD
         P -- "No" --> R["Create anonymous Visitor with UUID7 session_token"]
         Q --> SS["Create VisitorSession status=active"]
         R --> SS
-        SS --> T["SurveyAgent make event, booth, visitor if named"]
+        SS --> T["SurveyAgent make event, booth, visitor if named\n+ buildTargetingStrategy based on occupation/age_range"]
         T --> U["forUser visitor: start remembered AI conversation"]
-        U --> V["Prompt greeting and one opening question"]
+        U --> V["Prompt: FIRST and ONLY greeting,\ntailored opening based on visitor profile,\nNO generic 'Welcome to [event]' phrases"]
         V --> W["Store SessionQuestion order 1"]
         W --> X["Return AI message to frontend"]
 
@@ -40,11 +40,11 @@ flowchart TD
         Z --> AA["Store SessionAnswer for current question"]
         AA --> AB{"question count >= 4?"}
         AB -- "No" --> AC["SurveyAgent continues last conversation"]
-        AC --> AD["Prompt: respond naturally and use knowledge tool if needed"]
+        AC --> AD["Prompt: CONTINUING conversation,\ndo NOT greet/welcome/re-introduce,\nrespond naturally, ask next targeted question"]
         AD --> AE["Store next SessionQuestion"]
         AE --> Y
         AB -- "Yes" --> AF["Mark VisitorSession completed"]
-        AF --> AG["Prompt final wrap-up ending with SURVEY_COMPLETE marker"]
+        AF --> AG["Prompt: FINAL exchange, summarize insights,\noffer helpful pointer, end with SURVEY_COMPLETE,\ndo NOT greet again"]
         AG --> AH["Frontend shows completed state"]
     end
 
