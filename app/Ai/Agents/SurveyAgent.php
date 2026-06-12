@@ -52,38 +52,21 @@ class SurveyAgent implements Agent, Conversational, HasTools
             $visitorInfo = "\n\nVisitor: {$this->visitor->name}";
 
             $details = [];
-            if ($this->visitor->job_title || $this->visitor->company) {
-                $parts = array_filter([$this->visitor->job_title, $this->visitor->company]);
+            if ($this->visitor->post || $this->visitor->company) {
+                $parts = array_filter([$this->visitor->post, $this->visitor->company]);
                 $details[] = implode(' at ', $parts);
             }
-            if ($this->visitor->organization && $this->visitor->organization !== $this->visitor->company) {
-                $details[] = "organization: {$this->visitor->organization}";
+            if ($this->visitor->department) {
+                $details[] = "department: {$this->visitor->department}";
             }
-            if ($this->visitor->occupation) {
-                $occupationLabels = [
-                    'company_owner_executive' => 'company owner/executive',
-                    'company_employee_government' => 'company employee/government employee',
-                    'sole_proprietor' => 'sole proprietor',
-                    'full_time_investor' => 'full-time investor',
-                    'corporate_investor' => 'corporate investor',
-                    'housewife_househusband' => 'housewife/househusband',
-                    'retiree' => 'retiree',
-                    'student' => 'student',
-                    'other' => 'other',
-                ];
-                $details[] = 'occupation: '.($occupationLabels[$this->visitor->occupation] ?? $this->visitor->occupation);
+            if ($this->visitor->industry) {
+                $details[] = "industry: {$this->visitor->industry}";
             }
-            if ($this->visitor->age_range) {
-                $ageLabels = [
-                    'under_20' => 'under 20',
-                    '20s' => '20s',
-                    '30s' => '30s',
-                    '40s' => '40s',
-                    '50s' => '50s',
-                    '60s' => '60s',
-                    '70s_and_over' => '70s and over',
-                ];
-                $details[] = 'age range: '.($ageLabels[$this->visitor->age_range] ?? $this->visitor->age_range);
+            if ($this->visitor->reception_category) {
+                $details[] = "reception category: {$this->visitor->reception_category}";
+            }
+            if ($this->visitor->responsible_organization) {
+                $details[] = "responsible organization: {$this->visitor->responsible_organization}";
             }
 
             if (! empty($details)) {
@@ -153,85 +136,106 @@ SURVEY STRATEGY (anonymous visitor — discover who they are through conversatio
 STRATEGY;
         }
 
-        $occupation = $this->visitor->occupation;
-        $ageRange = $this->visitor->age_range;
+        $industry = $this->visitor->industry;
 
-        $strategy = match ($occupation) {
-            'company_owner_executive' => <<<'S'
+        $strategy = match ($industry) {
+            'exporters', 'importers' => <<<'S'
 
-SURVEY STRATEGY (company owner/executive):
-This visitor is a decision-maker. Focus on:
-- Business growth: What new products/markets are they exploring? What's their expansion plan?
-- Sourcing needs: What volume/scale? What suppliers or partnerships are they seeking?
-- ROI and partnerships: What would make this event a success for their business?
-- Decision authority: They likely decide themselves — ask what criteria matter most (price, quality, uniqueness, logistics).
-- Tone: Professional, peer-to-peer. Respect their time.
-
-S,
-            'company_employee_government' => <<<'S'
-
-SURVEY STRATEGY (company employee/government employee):
-This visitor likely represents an organization. Focus on:
-- Department/team needs: What are they sourcing or researching on behalf of their org?
-- Approval process: Who else is involved in decisions? What's the procurement timeline?
-- Specific requirements: Any compliance, standards, or specifications they need to meet?
-- Professional development: Are they also here for learning or networking?
-- Tone: Professional but approachable.
+SURVEY STRATEGY (exporter/importer):
+This visitor is in international trade. Focus on:
+- Trade relationships: What markets are they targeting? What countries are they exporting to or importing from?
+- Product categories: What specific products do they deal with? Are they looking for new suppliers or buyers?
+- Logistics and compliance: Any challenges with shipping, customs, or regulations?
+- Partnership opportunities: Are they looking for new trade partners or distributors?
+- Tone: Professional, trade-focused. They think in terms of supply chains and market access.
 
 S,
-            'sole_proprietor' => <<<'S'
+            'wholesalers', 'department_stores', 'supermarkets_convenience_stores', 'other_retailers' => <<<'S'
 
-SURVEY STRATEGY (sole proprietor):
-This visitor runs their own small business. Focus on:
-- Niche and specialty: What's their business focus? What unique products/services do they offer?
-- Small-scale sourcing: What quantities? Budget constraints? Looking for flexible suppliers?
-- Differentiation: What makes their business stand out? What gaps are they trying to fill?
-- Cost-effectiveness: Price sensitivity, value-for-money, MOQs (minimum order quantities).
-- Tone: Friendly, entrepreneurial. They wear many hats.
-
-S,
-            'full_time_investor', 'corporate_investor' => <<<'S'
-
-SURVEY STRATEGY (investor):
-This visitor is evaluating opportunities. Focus on:
-- Market interests: What industries, sectors, or product categories are they watching?
-- Deal flow: Are they looking for companies to invest in, partner with, or acquire?
-- Trends: What market trends brought them here? What signals are they looking for?
-- Network: Who do they want to connect with? What kind of introductions would be valuable?
-- Tone: Sharp, data-oriented. They think in terms of returns and opportunities.
+SURVEY STRATEGY (wholesaler/retailer):
+This visitor is in the retail/distribution sector. Focus on:
+- Product sourcing: What product categories are they looking for? What volume do they need?
+- Supplier relationships: Are they looking for new suppliers or expanding existing relationships?
+- Market trends: What consumer trends are they seeing? What products are in demand?
+- Quality and pricing: What are their priorities — price, quality, variety, or reliability?
+- Tone: Business-focused, practical. They think in terms of margins and customer demand.
 
 S,
-            'housewife_househusband' => <<<'S'
+            'restaurants', 'hotels', 'catering_companies' => <<<'S'
 
-SURVEY STRATEGY (housewife/househusband):
-This visitor is likely here for personal or family interests. Focus on:
-- Personal interests: What products or categories caught their eye? Hobbies, lifestyle, home?
-- Family needs: Are they shopping for family, looking for gifts, or exploring something new?
-- Experience: What would make this a great outing for them? Any specific booths or demos?
-- Follow-up: What kind of updates or offers would they find useful?
-- Tone: Warm, casual, welcoming. No business jargon.
-
-S,
-            'retiree' => <<<'S'
-
-SURVEY STRATEGY (retiree):
-This visitor has time and experience. Focus on:
-- Interests and hobbies: What draws them to this event? What are they passionate about?
-- Community: Are they here for social connection, learning, or personal enrichment?
-- Experience: How are they finding the event? Any accessibility or comfort needs?
-- Wisdom: They may have valuable industry experience — ask about their perspective.
-- Tone: Respectful, unhurried, conversational.
+SURVEY STRATEGY (hospitality/food service):
+This visitor is in the hospitality or food service industry. Focus on:
+- Food and beverage needs: What specific products are they sourcing? Fresh ingredients, specialty items, beverages?
+- Quality standards: Any specific quality or certification requirements (organic, halal, etc.)?
+- Volume and frequency: How much do they need and how often?
+- Menu innovation: Are they looking for new products to add to their offerings?
+- Tone: Service-oriented, quality-focused. They care about guest experience and consistency.
 
 S,
-            'student' => <<<'S'
+            'meat_manufacturers', 'agricultural_product_manufacturers', 'seafood_manufacturers', 'liquor_manufacturers', 'food_and_beverage_manufacturers', 'other_food_manufacturers' => <<<'S'
 
-SURVEY STRATEGY (student):
-This visitor is exploring and learning. Focus on:
-- Field of study: What are they studying? How does this event relate to their education?
-- Career interests: What industries or roles are they considering? What are they hoping to learn?
-- Innovation: What new technologies or trends excite them?
-- Networking: Are they looking for internships, mentors, or industry connections?
-- Tone: Encouraging, energetic. Help them make the most of the experience.
+SURVEY STRATEGY (food/beverage manufacturer):
+This visitor is in food or beverage manufacturing. Focus on:
+- Raw materials: What ingredients or raw materials do they need? Are they looking for new suppliers?
+- Production scale: What volume do they operate at? Any capacity expansion plans?
+- Quality and compliance: Any specific standards, certifications, or regulations they need to meet?
+- Innovation: Are they developing new products? What trends are they following?
+- Tone: Technical, production-focused. They think in terms of supply reliability and quality consistency.
+
+S,
+            'producers_agricultural_cooperatives' => <<<'S'
+
+SURVEY STRATEGY (producer/agricultural cooperative):
+This visitor represents producers or agricultural cooperatives. Focus on:
+- Products: What do they produce? Are they looking for buyers or distribution channels?
+- Scale and capacity: What's their production capacity? Can they meet large orders?
+- Market access: Are they trying to enter new markets or expand existing ones?
+- Partnerships: Are they looking for exporters, distributors, or processing partners?
+- Tone: Partnership-oriented, growth-focused. They want to connect their products with markets.
+
+S,
+            'logistics_warehousing' => <<<'S'
+
+SURVEY STRATEGY (logistics/warehousing):
+This visitor is in logistics or warehousing. Focus on:
+- Services: What logistics services do they offer? Shipping, warehousing, distribution?
+- Capacity: What's their storage or transport capacity? Are they expanding?
+- Technology: Are they using any logistics tech or looking for efficiency improvements?
+- Partnerships: Are they looking for clients or partners in the supply chain?
+- Tone: Operational, efficiency-focused. They think in terms of throughput and reliability.
+
+S,
+            'mail_order_businesses' => <<<'S'
+
+SURVEY STRATEGY (mail-order business):
+This visitor runs a mail-order or e-commerce business. Focus on:
+- Product range: What products do they sell online? Are they looking for new suppliers?
+- Fulfillment: How do they handle shipping and fulfillment? Any challenges?
+- Market reach: What regions do they serve? Are they expanding?
+- Supplier needs: What are they looking for in suppliers — reliability, pricing, variety?
+- Tone: E-commerce focused, customer-centric. They think in terms of online sales and delivery.
+
+S,
+            'import_export_support_consulting' => <<<'S'
+
+SURVEY STRATEGY (import/export support/consulting):
+This visitor provides trade support or consulting services. Focus on:
+- Services: What kind of support do they offer? Market research, compliance, logistics consulting?
+- Client needs: What industries do they serve? What are their clients looking for?
+- Market insights: What trends are they seeing in international trade?
+- Partnerships: Are they looking for partners or clients to work with?
+- Tone: Advisory, knowledge-focused. They think in terms of market intelligence and client solutions.
+
+S,
+            'government_agencies_local_authorities', 'embassies_consulates' => <<<'S'
+
+SURVEY STRATEGY (government/diplomatic):
+This visitor represents a government agency or diplomatic mission. Focus on:
+- Purpose: Are they here for trade promotion, market research, or diplomatic relations?
+- Support: Are they looking to support businesses from their country or region?
+- Partnerships: Are they facilitating trade relationships or looking for specific industries?
+- Policy: Any policy or regulatory aspects they're interested in?
+- Tone: Formal, respectful. They represent official institutions and think in terms of bilateral relations.
 
 S,
             default => <<<'S'
@@ -244,16 +248,7 @@ SURVEY STRATEGY (general visitor):
 S,
         };
 
-        // Age-based adjustments
-        $ageNote = match ($ageRange) {
-            'under_20', '20s' => "\nAGE NOTE: Young visitor — lean into innovation, technology, social media, trends, and future career relevance.",
-            '30s', '40s' => "\nAGE NOTE: Mid-career visitor — focus on practical business value, growth, and efficiency.",
-            '50s', '60s' => "\nAGE NOTE: Experienced visitor — emphasize quality, reliability, established relationships, and proven track records.",
-            '70s_and_over' => "\nAGE NOTE: Senior visitor — be patient, clear, and focus on personal interest and enjoyment.",
-            default => '',
-        };
-
-        return $strategy.$ageNote;
+        return $strategy;
     }
 
     /** @return Message[] */

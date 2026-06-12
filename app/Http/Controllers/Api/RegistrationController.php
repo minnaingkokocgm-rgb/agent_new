@@ -89,19 +89,18 @@ class RegistrationController extends Controller
         $validated = $request->validate([
             'session_token' => ['required', 'string'],
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:50'],
             'company' => ['nullable', 'string', 'max:255'],
+            'industry' => ['nullable', 'string', 'max:255'],
+            'department' => ['nullable', 'string', 'max:255'],
+            'post' => ['nullable', 'string', 'max:255'],
             'post_code' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
-            'organization' => ['nullable', 'string', 'max:255'],
-            'occupation' => ['nullable', 'string', 'max:100'],
-            'age_range' => ['nullable', 'string', 'max:50'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'email' => ['required', 'email', 'max:255'],
+            'password' => ['required', 'string', 'min:6', 'max:255'],
             'opt_out' => ['nullable', 'boolean'],
-            'job_title' => ['nullable', 'string', 'max:255'],
-            'country' => ['nullable', 'string', 'max:100'],
-            'source' => ['nullable', 'string', 'max:100'],
-            'notes' => ['nullable', 'string', 'max:2000'],
+            'reception_category' => ['nullable', 'string', 'max:255'],
+            'responsible_organization' => ['nullable', 'string', 'max:255'],
         ]);
 
         $registration = Registration::where('session_token', $request->input('session_token'))->firstOrFail();
@@ -109,22 +108,23 @@ class RegistrationController extends Controller
         // Create a Visitor record from registration data for survey flow
         $visitor = Visitor::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
             'company' => $validated['company'] ?? null,
+            'industry' => $validated['industry'] ?? null,
+            'department' => $validated['department'] ?? null,
+            'post' => $validated['post'] ?? null,
             'post_code' => $validated['post_code'] ?? null,
             'address' => $validated['address'] ?? null,
-            'organization' => $validated['organization'] ?? null,
-            'occupation' => $validated['occupation'] ?? null,
-            'age_range' => $validated['age_range'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'email' => $validated['email'],
             'opt_out' => $validated['opt_out'] ?? false,
-            'job_title' => $validated['job_title'] ?? null,
-            'country' => $validated['country'] ?? null,
+            'reception_category' => $validated['reception_category'] ?? null,
+            'responsible_organization' => $validated['responsible_organization'] ?? null,
             'session_token' => $registration->session_token,
         ]);
 
         $registration->update([
             ...$validated,
+            'password' => bcrypt($validated['password']),
             'visitor_id' => $visitor->id,
             'status' => 'submitted',
         ]);

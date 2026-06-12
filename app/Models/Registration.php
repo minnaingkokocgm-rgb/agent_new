@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'event_id', 'visitor_id', 'name', 'email', 'phone', 'company',
-    'post_code', 'address', 'organization', 'occupation', 'age_range', 'opt_out',
-    'job_title', 'country', 'source', 'notes',
+    'event_id', 'visitor_id', 'name', 'email', 'password', 'phone', 'company',
+    'industry', 'department', 'post', 'post_code', 'address', 'opt_out',
+    'reception_category', 'responsible_organization',
     'document_path', 'session_token', 'status', 'metadata',
 ])]
 class Registration extends Model

@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Ai\Tools\EventKnowledgeSearch;
 use App\Models\Booth;
 use App\Models\Event;
 use App\Models\KnowledgeChunk;
@@ -37,6 +38,9 @@ class IndexKnowledge
             ]);
             $inserted++;
         }
+
+        // Clear knowledge search cache for this event/booth
+        EventKnowledgeSearch::clearCache($event, $booth);
 
         return $inserted;
     }

@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'session_token', 'name', 'email', 'phone', 'company',
-    'post_code', 'address', 'organization', 'occupation', 'age_range', 'opt_out',
-    'job_title', 'country', 'metadata',
+    'industry', 'department', 'post', 'post_code', 'address', 'opt_out',
+    'reception_category', 'responsible_organization', 'metadata',
 ])]
 class Visitor extends Model
 {

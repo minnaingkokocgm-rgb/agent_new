@@ -73,16 +73,6 @@
             max-height: 300px;
         }
     }
-    .form-section-title {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #0d6efd;
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #e0e0e0;
-    }
 </style>
 @endpush
 
@@ -96,152 +86,115 @@
         </div>
 
         <form id="registrationForm">
-            <div class="form-section-title">
-                <i class="bi bi-person-badge"></i> Personal Information
-            </div>
-
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
-                    <input type="text" name="name" id="name" class="form-control" required
-                        placeholder="As it should appear on your badge">
-                </div>
-                <div class="col-md-6">
-                    <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
-                    <input type="email" name="email" id="email" class="form-control" required
-                        placeholder="you@company.com">
-                </div>
-            </div>
-
-            <div class="form-section-title mt-4">
-                <i class="bi bi-geo-alt"></i> Location
-            </div>
-
-            <div class="row g-3 mb-3">
-                <div class="col-md-4">
-                    <label for="post_code" class="form-label">Post Code <small class="text-muted">(optional)</small></label>
-                    <input type="text" name="post_code" id="post_code" class="form-control"
-                        placeholder="Postal/ZIP code">
-                </div>
-                <div class="col-md-8">
-                    <label for="address" class="form-label">Address <small class="text-muted">(optional)</small></label>
-                    <input type="text" name="address" id="address" class="form-control"
-                        placeholder="Mailing address">
-                </div>
-            </div>
-
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="country" class="form-label">Country <small class="text-muted">(optional)</small></label>
-                    <select name="country" id="country" class="form-select">
-                        <option value="">Select country...</option>
-                        <option value="US">United States</option>
-                        <option value="GB">United Kingdom</option>
-                        <option value="DE">Germany</option>
-                        <option value="FR">France</option>
-                        <option value="JP">Japan</option>
-                        <option value="SG">Singapore</option>
-                        <option value="MM">Myanmar</option>
-                        <option value="TH">Thailand</option>
-                        <option value="VN">Vietnam</option>
-                        <option value="ID">Indonesia</option>
-                        <option value="PH">Philippines</option>
-                        <option value="AU">Australia</option>
-                        <option value="CA">Canada</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-section-title mt-4">
-                <i class="bi bi-building"></i> Professional Information
-            </div>
-
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="company" class="form-label">Company <small class="text-muted">(optional)</small></label>
-                    <input type="text" name="company" id="company" class="form-control"
-                        placeholder="Where you work">
-                </div>
-                <div class="col-md-6">
-                    <label for="organization" class="form-label">Organization <small class="text-muted">(optional)</small></label>
-                    <input type="text" name="organization" id="organization" class="form-control"
-                        placeholder="Additional affiliation">
-                </div>
-            </div>
-
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="job_title" class="form-label">Job Title <small class="text-muted">(optional)</small></label>
-                    <input type="text" name="job_title" id="job_title" class="form-control"
-                        placeholder="e.g. Software Engineer, CTO">
-                </div>
-                <div class="col-md-6">
-                    <label for="occupation" class="form-label">Occupation <small class="text-muted">(optional)</small></label>
-                    <select name="occupation" id="occupation" class="form-select">
-                        <option value="">Select occupation...</option>
-                        <option value="company_owner_executive">Company owners/executives</option>
-                        <option value="company_employee_government">Company employees/government employees</option>
-                        <option value="sole_proprietor">Sole proprietors</option>
-                        <option value="full_time_investor">Full-time investors</option>
-                        <option value="corporate_investor">Corporate investors</option>
-                        <option value="housewife_househusband">Housewives/househusbands</option>
-                        <option value="retiree">Retirees</option>
-                        <option value="student">Students</option>
-                        <option value="other">Others</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-section-title mt-4">
-                <i class="bi bi-person-circle"></i> Demographics
-            </div>
-
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="age_range" class="form-label">Age Range <small class="text-muted">(optional)</small></label>
-                    <select name="age_range" id="age_range" class="form-select">
-                        <option value="">Select age range...</option>
-                        <option value="under_20">Under 20s</option>
-                        <option value="20s">20s</option>
-                        <option value="30s">30s</option>
-                        <option value="40s">40s</option>
-                        <option value="50s">50s</option>
-                        <option value="60s">60s</option>
-                        <option value="70s_and_over">70s and over</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-section-title mt-4">
-                <i class="bi bi-info-circle"></i> Additional Information
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                <input type="text" name="name" id="name" class="form-control" required
+                    placeholder="Your full name">
             </div>
 
             <div class="mb-3">
-                <label for="source" class="form-label">How did you hear about this event? <small class="text-muted">(optional)</small></label>
-                <select name="source" id="source" class="form-select">
-                    <option value="">Select...</option>
-                    <option value="social_media">Social Media (LinkedIn, Twitter, etc.)</option>
-                    <option value="email">Email Invitation</option>
-                    <option value="referral">Friend / Colleague Referral</option>
-                    <option value="website">Event Website</option>
-                    <option value="search">Search Engine</option>
-                    <option value="other">Other</option>
+                <label for="company" class="form-label">Company</label>
+                <input type="text" name="company" id="company" class="form-control"
+                    placeholder="Company name">
+            </div>
+
+            <div class="mb-3">
+                <label for="industry" class="form-label">Industry</label>
+                <select name="industry" id="industry" class="form-select">
+                    <option value="">Select industry...</option>
+                    <option value="exporters">Exporters</option>
+                    <option value="importers">Importers</option>
+                    <option value="wholesalers">Wholesalers</option>
+                    <option value="department_stores">Department stores</option>
+                    <option value="supermarkets_convenience_stores">Supermarkets/convenience stores</option>
+                    <option value="other_retailers">Other retailers (liquor stores, butcher shops, greengrocers, fishmongers, etc.)</option>
+                    <option value="mail_order_businesses">Mail-order businesses</option>
+                    <option value="restaurants">Restaurants</option>
+                    <option value="hotels">Hotels</option>
+                    <option value="catering_companies">Catering companies</option>
+                    <option value="meat_manufacturers">Meat manufacturers</option>
+                    <option value="agricultural_product_manufacturers">Agricultural product manufacturers</option>
+                    <option value="seafood_manufacturers">Seafood manufacturers</option>
+                    <option value="liquor_manufacturers">Liquor manufacturers</option>
+                    <option value="food_and_beverage_manufacturers">Food and beverage manufacturers</option>
+                    <option value="other_food_manufacturers">Other food manufacturers</option>
+                    <option value="producers_agricultural_cooperatives">Producers/agricultural cooperatives</option>
+                    <option value="logistics_warehousing">Logistics/warehousing</option>
+                    <option value="import_export_support_consulting">Import/export support/consulting</option>
+                    <option value="government_agencies_local_authorities">Government agencies/local authorities/industry associations</option>
+                    <option value="embassies_consulates">Embassies/consulates</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="department" class="form-label">Department</label>
+                <input type="text" name="department" id="department" class="form-control"
+                    placeholder="Your department">
+            </div>
+
+            <div class="mb-3">
+                <label for="post" class="form-label">Post</label>
+                <input type="text" name="post" id="post" class="form-control"
+                    placeholder="Your job title or position">
+            </div>
+
+            <div class="mb-3">
+                <label for="post_code" class="form-label">Post Code</label>
+                <input type="text" name="post_code" id="post_code" class="form-control"
+                    placeholder="Postal/ZIP code">
+            </div>
+
+            <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <input type="text" name="address" id="address" class="form-control"
+                    placeholder="Your address">
+            </div>
+
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="tel" name="phone" id="phone" class="form-control"
+                    placeholder="Your phone number">
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" name="email" id="email" class="form-control" required
+                    placeholder="you@example.com">
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                <input type="password" name="password" id="password" class="form-control" required
+                    placeholder="Minimum 6 characters" minlength="6">
+            </div>
+
+            <div class="mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="opt_out" id="opt_out" value="1">
+                    <label class="form-check-label small" for="opt_out">
+                        Those who register will receive information about our exhibitions, seminars, and related services via direct mail, email, etc. If you do not wish to receive such information, please check the box below. <strong>(I do not wish to.)</strong>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="reception_category" class="form-label">Category at Reception</label>
+                <select name="reception_category" id="reception_category" class="form-select">
+                    <option value="">Please select your application type</option>
+                    <option value="category_1">Category 1</option>
+                    <option value="category_2">Category 2</option>
+                    <option value="category_3">Category 3</option>
                 </select>
             </div>
 
             <div class="mb-4">
-                <label for="notes" class="form-label">Notes / Special Requirements <small class="text-muted">(optional)</small></label>
-                <textarea name="notes" id="notes" rows="3" class="form-control"
-                    placeholder="Dietary restrictions, accessibility needs, questions for organizers..."></textarea>
-            </div>
-
-            <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="opt_out" id="opt_out" value="1">
-                    <label class="form-check-label small" for="opt_out">
-                        I do not wish to receive information about exhibitions, seminars, and related services via direct mail, email, etc.
-                    </label>
-                </div>
+                <label for="responsible_organization" class="form-label">Responsible Organization</label>
+                <select name="responsible_organization" id="responsible_organization" class="form-select">
+                    <option value="">Select organization...</option>
+                    <option value="organization_1">Organization 1</option>
+                    <option value="organization_2">Organization 2</option>
+                    <option value="organization_3">Organization 3</option>
+                </select>
             </div>
 
             <div id="formAlert" class="alert d-none"></div>
@@ -377,19 +330,18 @@ $(function() {
             data: JSON.stringify({
                 session_token: sessionToken,
                 name: $('#name').val(),
-                email: $('#email').val(),
-                phone: $('#phone').val(),
                 company: $('#company').val(),
+                industry: $('#industry').val(),
+                department: $('#department').val(),
+                post: $('#post').val(),
                 post_code: $('#post_code').val(),
                 address: $('#address').val(),
-                organization: $('#organization').val(),
-                occupation: $('#occupation').val(),
-                age_range: $('#age_range').val(),
+                phone: $('#phone').val(),
+                email: $('#email').val(),
+                password: $('#password').val(),
                 opt_out: $('#opt_out').is(':checked'),
-                job_title: $('#job_title').val(),
-                country: $('#country').val(),
-                source: $('#source').val(),
-                notes: $('#notes').val()
+                reception_category: $('#reception_category').val(),
+                responsible_organization: $('#responsible_organization').val()
             }),
             success: function(res) {
                 $formAlert.removeClass('d-none alert-danger').addClass('alert-success')

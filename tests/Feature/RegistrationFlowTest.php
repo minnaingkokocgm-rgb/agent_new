@@ -69,18 +69,18 @@ test('registration form can be submitted', function () {
     $response = $this->postJson('/api/registration/submit', [
         'session_token' => $token,
         'name' => 'John Doe',
-        'email' => 'john@example.com',
-        'phone' => '+1-555-123-4567',
         'company' => 'Acme Corp',
+        'industry' => 'exporters',
+        'department' => 'Sales',
+        'post' => 'Sales Manager',
         'post_code' => '10001',
         'address' => '123 Main St, New York',
-        'organization' => 'Tech Alliance',
-        'occupation' => 'company_employee_government',
-        'age_range' => '30s',
+        'phone' => '+1-555-123-4567',
+        'email' => 'john@example.com',
+        'password' => 'secret123',
         'opt_out' => false,
-        'job_title' => 'Software Engineer',
-        'country' => 'US',
-        'source' => 'website',
+        'reception_category' => 'category_1',
+        'responsible_organization' => 'organization_1',
     ]);
 
     $response->assertOk()
